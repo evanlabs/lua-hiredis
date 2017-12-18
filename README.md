@@ -14,12 +14,12 @@ is not 1.0 yet. But all the features necessary for regular usage are here.
 API
 ---
 
-* `hiredis.connect(host / socket : string, port : number / nil) : conn / nil, err, error_code`
+* `hiredis.connect(host : string, port : number, timeout : number / nil) : conn / nil, err, error_code`
 
   * `hiredis.connect("localhost", 6379)` connects to Redis at `localhost:6379`
     via TCP/IP socket.
-  * `hiredis.connect("/var/run/redis/redis.sock")` connects to Redis at
-    `/var/run/redis/redis.sock` via Unix domain socket.
+  * ~~`hiredis.connect("/var/run/redis/redis.sock")` connects to Redis at
+    `/var/run/redis/redis.sock` via Unix domain socket.~~
 
 * `hiredis.unwrap_reply(reply) : reply / name, hiredis.REPLY_STATUS / nil, err`
 
