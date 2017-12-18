@@ -14,7 +14,11 @@ extern "C" {
 }
 #endif
 
-#include "hiredis/hiredis.h"
+#include "hiredis.h"
+
+#ifdef _MSC_VER
+#  include <WinSock2.h>
+#endif
 
 #if 0
   #define SPAM(a) printf a
@@ -436,16 +440,29 @@ static int lhiredis_connect(lua_State * L)
   luahiredis_Connection * pResult = NULL;
   redisContext * pContext = NULL;
 
-  const char * host_or_socket = luaL_checkstring(L, 1);
+  struct timeval tv;
+  int ms = 0; /* connect timeout */
 
-  /* TODO: Support Timeout and UnixTimeout flavors */
-  if (lua_isnoneornil(L, 2))
+  const char * host = luaL_checkstring(L, 1);
+  int port = luaL_checkint(L, 2);
+
+  /* TODO: Unix and UnixTimeout flavors */
+
+  int argc = lua_gettop(L);
+  if (argc >= 3)
   {
-    pContext = redisConnectUnix(host_or_socket);
+    ms = luaL_checkint(L, 3);
+  }
+
+  if (ms > 0)
+  {
+    tv.tv_sec = ms / 1000;
+    tv.tv_usec = ms % 1000 * 1000;
+	pContext = redisConnectWithTimeout(host, port, tv);
   }
   else
   {
-    pContext = redisConnect(host_or_socket, luaL_checkint(L, 2));
+    pContext = redisConnect(host, port);
   }
 
   if (!pContext)
